@@ -1,0 +1,175 @@
+<!-- templates/video_analysis.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Video Analysis</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadVideoModal">
+        <i class="fas fa-upload"></i> Upload Video
+    </button>
+</div>
+
+<div class="row">
+    {% for video in videos %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {% for athlete in athletes %}
+                        {% if athlete._id|string == video.athlete_id %}
+                            {{ athlete.name }}
+                        {% endif %}
+                    {% endfor %}
+                </h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ video.analysis_type }}</h6>
+                <p class="card-text">
+                    Uploaded: {{ video.upload_date.strftime('%Y-%m-%d %H:%M') }}<br>
+                    Status: <span class="badge bg-{{ 'info' if video.status == 'pending_analysis' else 'success' }}">{{ video.status|replace('_', ' ')|title }}</span>
+                </p>
+                {% if video.notes %}
+                <p class="card-text"><small>{{ video.notes }}</small></p>
+                {% endif %}
+                
+                <div class="btn-group">
+                    <a href="{{ url_for('static', filename='uploads/' + video.filename) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                        <i class="fas fa-play"></i> Play
+                    </a>
+                    {% if video.status == 'pending_analysis' %}
+                    <a href="{{ url_for('analyze_video', video_id=video._id) }}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-search"></i> Analyze
+                    </a>
+                    {% else %}
+                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#analysisModal{{ video._id }}">
+                        <i class="fas fa-chart-bar"></i> Results
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Results Modal -->
+    {% if video.status == 'analyzed' %}
+    <div class="modal fade" id="analysisModal{{ video._id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Analysis Results</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Technique Score</h6>
+                            <div class="progress mb-3" style="height: 30px;">
+                                <div class="progress-bar bg-success" role="progressbar" 
+                                     style="width: {{ video.analysis_data.technique_score }}%;" 
+                                     aria-valuenow="{{ video.analysis_data.technique_score }}" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    {{ video.analysis_data.technique_score }}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Analysis Date</h6>
+                            <p>{{ video.analysis_data.analysis_date.strftime('%Y-%m-%d %H:%M') }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6>Form Issues</h6>
+                            <ul class="list-group">
+                                {% for issue in video.analysis_data.form_issues %}
+                                <li class="list-group-item list-group-item-warning">{{ issue }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Strengths</h6>
+                            <ul class="list-group">
+                                {% for strength in video.analysis_data.strengths %}
+                                <li class="list-group-item list-group-item-success">{{ strength }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <h6>Recommendations</h6>
+                        <div class="card">
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    {% for recommendation in video.analysis_data.recommendations %}
+                                    <li><i class="fas fa-check-circle text-success me-2"></i> {{ recommendation }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No videos uploaded yet. Upload your first video for analysis.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Upload Video Modal -->
+<div class="modal fade" id="uploadVideoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Video for Analysis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('upload_video') }}" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Athlete</label>
+                        <select class="form-select" name="athlete_id" required>
+                            <option value="">Choose Athlete</option>
+                            {% for athlete in athletes %}
+                            <option value="{{ athlete._id }}">{{ athlete.name }} ({{ athlete.sport }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Analysis Type</label>
+                        <select class="form-select" name="analysis_type" required>
+                            <option value="">Select Analysis Type</option>
+                            <option value="technique">Technique Analysis</option>
+                            <option value="form">Form Analysis</option>
+                            <option value="movement">Movement Analysis</option>
+                            <option value="performance">Performance Analysis</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Video File</label>
+                        <input type="file" class="form-control" name="video_file" accept="video/*" required>
+                        <div class="form-text">Max file size: 100MB. Supported formats: MP4, AVI, MOV, WMV, FLV, WebM</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Notes (Optional)</label>
+                        <textarea class="form-control" name="notes" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload Video</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

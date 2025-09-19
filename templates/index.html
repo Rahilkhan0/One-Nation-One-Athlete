@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center hero-section">
+    <div class="col-md-6">
+        <h1 class="display-4 fw-bold">One Nation, One Athlete Platform</h1>
+        <p class="lead">Ensuring Fairness, Access, and Opportunity in Sports</p>
+        <p>India's premier platform for coaches to manage athletes, track performance, prevent injuries, and nurture diverse talent across all sports.</p>
+        <div class="mt-4">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-2">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+        </div>
+    </div>
+    <div class="col-md-6 text-center">
+        <img src="https://via.placeholder.com/500x300" class="img-fluid rounded" alt="Athletes in action">
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                <h4>Athlete Management</h4>
+                <p>Efficiently manage multiple athletes with detailed profiles, performance tracking, and personalized training plans.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-first-aid fa-3x text-warning mb-3"></i>
+                <h4>Injury Prevention</h4>
+                <p>Monitor athlete health, track injuries, and implement recovery plans to keep athletes in top condition.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-video fa-3x text-info mb-3"></i>
+                <h4>Video Analysis</h4>
+                <p>Upload and analyze athlete performance videos to provide targeted feedback and improvement plans.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card bg-light">
+            <div class="card-body text-center">
+                <h3>Join Hundreds of Coaches Across India</h3>
+                <p class="lead">Be part of the movement to transform India's sporting landscape</p>
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Register Now</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.hero-section {
+    min-height: 70vh;
+    padding: 2rem 0;
+}
+</style>
+{% endblock %}

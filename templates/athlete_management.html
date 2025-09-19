@@ -1,0 +1,103 @@
+<!-- templates/athlete_management.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Athlete Management</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAthleteModal">
+        <i class="fas fa-user-plus"></i> Add New Athlete
+    </button>
+</div>
+
+<div class="row">
+    {% for athlete in athletes %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ athlete.name }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ athlete.sport }}</h6>
+                <p class="card-text">
+                    Age: {{ athlete.age }}<br>
+                    Location: {{ athlete.location }}<br>
+                    Status: <span class="badge bg-{{ 'success' if athlete.status == 'active' else 'warning' if athlete.status == 'recovering' else 'danger' }}">{{ athlete.status|title }}</span>
+                </p>
+                <a href="{{ url_for('performance_tracking', athlete_id=athlete._id) }}" class="btn btn-sm btn-outline-primary">Performance</a>
+                <a href="#" class="btn btn-sm btn-outline-info">Details</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            No athletes found. Add your first athlete to get started.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Add Athlete Modal -->
+<div class="modal fade" id="addAthleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Athlete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_athlete') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-control" name="age" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sport</label>
+                        <input type="text" class="form-control" name="sport" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gender</label>
+                        <select class="form-select" name="gender" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" name="location" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact Information</label>
+                        <input type="text" class="form-control" name="contact" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Disabilities (if any)</label>
+                        <input type="text" class="form-control" name="disabilities">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Language Preference</label>
+                        <select class="form-select" name="language_preference">
+                            <option value="en">English</option>
+                            <option value="hi">Hindi</option>
+                            <option value="ta">Tamil</option>
+                            <option value="te">Telugu</option>
+                            <option value="kn">Kannada</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="bn">Bengali</option>
+                            <option value="mr">Marathi</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Athlete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
